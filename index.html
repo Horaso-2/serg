@@ -5,55 +5,53 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SERG — Social Epistemology Reading Group</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 
 :root{
-  --paper:#F5F7F4; --surface:#FFFFFF; --ink:#1C2433; --muted:#566172; --line:#D6DCD6;
-  --open:#2B7563; --open-bg:#E1EFE9; --pending:#8E630E; --pending-bg:#F5EBD3;
-  --booked:#2B3D66; --booked-bg:#E3E8F3; --cancel:#868C96; --danger:#A33A2E;
-  --focus:#3C6FD1;
-  --serif:"Literata", Georgia, "Times New Roman", serif;
-  --sans:"Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --paper:#FFFFFF; --surface:#FFFFFF; --ink:#000000; --muted:#5C5C5C; --line:#DADADA;
+  --open:#000000; --open-bg:transparent; --pending:#000000; --pending-bg:#EFEFEF;
+  --booked:#000000; --booked-bg:#F4F4F4; --cancel:#8A8A8A; --danger:#000000;
+  --focus:#000000; --soft:#9A9A9A;
+  --serif:"Helvetica Neue", Helvetica, Arial, sans-serif;
+  --sans:"Helvetica Neue", Helvetica, Arial, sans-serif;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --paper:#131820; --surface:#1A2029; --ink:#E6E9EE; --muted:#9AA4B3; --line:#2D3541;
-    --open:#6CC2AA; --open-bg:#19332D; --pending:#E0B45E; --pending-bg:#372D17;
-    --booked:#AABDE9; --booked-bg:#222B41; --cancel:#7D8592; --danger:#E27D70; --focus:#86A9F0;
+    --paper:#000000; --surface:#0D0D0D; --ink:#FFFFFF; --muted:#A8A8A8; --line:#333333;
+    --open:#FFFFFF; --open-bg:transparent; --pending:#FFFFFF; --pending-bg:#222222;
+    --booked:#FFFFFF; --booked-bg:#161616; --cancel:#777777; --danger:#FFFFFF; --focus:#FFFFFF; --soft:#666666;
   }
 }
 :root[data-theme="dark"]{
-  --paper:#131820; --surface:#1A2029; --ink:#E6E9EE; --muted:#9AA4B3; --line:#2D3541;
-  --open:#6CC2AA; --open-bg:#19332D; --pending:#E0B45E; --pending-bg:#372D17;
-  --booked:#AABDE9; --booked-bg:#222B41; --cancel:#7D8592; --danger:#E27D70; --focus:#86A9F0;
+  --paper:#000000; --surface:#0D0D0D; --ink:#FFFFFF; --muted:#A8A8A8; --line:#333333;
+  --open:#FFFFFF; --open-bg:transparent; --pending:#FFFFFF; --pending-bg:#222222;
+  --booked:#FFFFFF; --booked-bg:#161616; --cancel:#777777; --danger:#FFFFFF; --focus:#FFFFFF; --soft:#666666;
 }
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
 .wrap{max-width:980px;margin:0 auto;padding:0 20px}
-a{color:var(--booked)}
+a{color:var(--ink)}
+input[type=radio],input[type=checkbox]{accent-color:var(--ink)}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 
 /* Header */
 header.top{padding:40px 0 8px}
 .brand{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-.brand h1{font:700 clamp(40px,7vw,64px)/1 var(--serif);letter-spacing:-.02em;margin:0}
+.brand h1{font:700 clamp(40px,7vw,64px)/1 var(--serif);letter-spacing:-.035em;margin:0}
 .brand p{margin:0;font:400 18px/1.3 var(--serif);color:var(--muted)}
 .about{max-width:62ch;color:var(--muted);margin:14px 0 0}
 nav.tabs{display:flex;gap:4px;margin:28px 0 0;border-bottom:1px solid var(--line)}
 nav.tabs button{background:none;border:0;padding:10px 14px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;font-weight:500}
 nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
-.badge{display:inline-block;min-width:20px;padding:0 6px;margin-left:6px;border-radius:10px;background:var(--pending-bg);color:var(--pending);font-size:12px;font-weight:600;text-align:center}
+.badge{display:inline-block;min-width:20px;padding:0 6px;margin-left:6px;border-radius:0;background:var(--ink);color:var(--paper);font-size:12px;font-weight:600;text-align:center}
 
 /* Next meeting */
-.next{margin:28px 0 8px;padding:22px 24px;background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--booked);border-radius:4px;display:grid;gap:4px}
-.next.open{border-left-color:var(--open)}
+.next{margin:28px 0 8px;padding:22px 24px;background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--booked);border-radius:0;display:grid;gap:4px}
+.next.open{border-left-color:var(--soft)}
 .next small{color:var(--muted);font-weight:500}
 .next .when{font:600 24px/1.25 var(--serif)}
 .next .what{font:400 19px/1.4 var(--serif)}
@@ -61,13 +59,14 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(-
 
 /* Controls */
 .bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin:28px 0 12px}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--surface)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:0;overflow:hidden;background:var(--surface)}
 .seg button{border:0;background:none;padding:7px 12px;cursor:pointer;color:var(--muted)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 .actions{display:flex;flex-wrap:wrap;gap:8px}
-.btn{border:1px solid var(--ink);background:var(--ink);color:var(--paper);padding:8px 14px;border-radius:6px;cursor:pointer;font-weight:500;text-decoration:none;display:inline-block;line-height:1.3}
-.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
-.btn.open{background:var(--open);border-color:var(--open);color:#fff}
+.btn{border:1px solid var(--ink);background:var(--ink);color:var(--paper);padding:8px 14px;border-radius:0;cursor:pointer;font-weight:500;text-decoration:none;display:inline-block;line-height:1.3}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--ink)}
+.btn:hover:not(:disabled){opacity:.8}
+.btn.open{background:var(--ink);border-color:var(--ink);color:var(--paper)}
 .btn.small{padding:5px 10px;font-size:14px}
 .btn.danger{background:transparent;color:var(--danger);border-color:var(--danger)}
 .btn:disabled{opacity:.5;cursor:not-allowed}
@@ -87,14 +86,14 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(-
 .content{min-width:0}
 .content .title{font:400 18px/1.35 var(--serif);overflow-wrap:anywhere}
 .content .who{color:var(--muted);font-size:14px}
-.tag{display:inline-block;font-size:13px;font-weight:600;padding:2px 8px;border-radius:4px;margin-bottom:4px}
-.tag.open{background:var(--open-bg);color:var(--open)}
-.tag.pending{background:var(--pending-bg);color:var(--pending)}
-.tag.booked{background:var(--booked-bg);color:var(--booked)}
+.tag{display:inline-block;font-size:13px;font-weight:600;padding:2px 8px;border-radius:0;margin-bottom:4px}
+.tag.open{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+.tag.pending{background:var(--pending-bg);color:var(--ink);border:1px dashed var(--ink)}
+.tag.booked{background:var(--ink);color:var(--paper);border:1px solid var(--ink)}
 .tag.cancelled{background:transparent;color:var(--cancel);border:1px solid var(--line)}
 .rowact{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
-.empty{padding:36px 20px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:6px;margin-top:20px}
-.notice{margin:20px 0 0;padding:12px 16px;border-radius:6px;background:var(--booked-bg);color:var(--ink);font-size:15px}
+.empty{padding:36px 20px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:0;margin-top:20px}
+.notice{margin:20px 0 0;padding:12px 16px;border-radius:0;background:var(--booked-bg);color:var(--ink);font-size:15px}
 .notice.warn{background:var(--pending-bg)}
 
 /* Lists (mine / admin) */
@@ -110,7 +109,7 @@ section.block > p.hint{color:var(--muted);margin:0 0 14px;font-size:15px}
 details.decided summary{cursor:pointer;color:var(--muted);margin-top:20px}
 
 /* Dialog + forms */
-dialog{border:1px solid var(--line);border-radius:8px;padding:0;background:var(--surface);color:var(--ink);width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 40px)}
+dialog{border:1px solid var(--line);border-radius:0;padding:0;background:var(--surface);color:var(--ink);width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 40px)}
 dialog::backdrop{background:rgba(10,14,20,.45)}
 .dlg{padding:22px 24px 20px;overflow:auto;max-height:calc(100vh - 42px)}
 .dlg h3{font:600 22px/1.25 var(--serif);margin:0 0 4px}
@@ -118,22 +117,23 @@ dialog::backdrop{background:rgba(10,14,20,.45)}
 .field{margin:0 0 16px}
 .field label,.field .lbl{display:block;font-weight:600;margin-bottom:5px}
 .field .help{display:block;color:var(--muted);font-size:14px;margin:-2px 0 6px;font-weight:400}
-input[type=text],input[type=email],input[type=url],input[type=date],input[type=number],select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:6px;background:var(--paper)}
+input[type=file]{width:100%;padding:8px 0}
+input[type=text],input[type=email],input[type=url],input[type=date],input[type=number],select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:0;background:var(--paper)}
 textarea{min-height:190px;resize:vertical;font-size:15px}
 .radios{display:flex;gap:18px}
 .radios label{font-weight:400;display:flex;align-items:center;gap:6px;cursor:pointer}
-.kindpick{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
-.kindpick button{text-align:left;padding:12px 14px;border:1px solid var(--line);border-radius:6px;background:var(--paper);cursor:pointer}
+.kindpick{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:18px}
+.kindpick button{text-align:left;padding:12px 14px;border:1px solid var(--line);border-radius:0;background:var(--paper);cursor:pointer}
 .kindpick button strong{display:block;font:600 17px/1.2 var(--serif)}
 .kindpick button span{color:var(--muted);font-size:13px}
 .kindpick button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap}
 .foot .right{display:flex;gap:8px;margin-left:auto}
-.err{color:var(--danger);font-size:14px;margin:0 0 10px}
+.err{color:var(--ink);font-weight:600;font-size:14px;margin:0 0 10px;padding-left:10px;border-left:3px solid var(--ink)}
 .check{display:flex;gap:8px;align-items:center;font-weight:400!important}
 
-#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:6px;opacity:0;pointer-events:none;transition:.2s;max-width:calc(100vw - 32px);z-index:10}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:0;opacity:0;pointer-events:none;transition:.2s;max-width:calc(100vw - 32px);z-index:10}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 footer{margin:60px 0 40px;color:var(--muted);font-size:14px}
 
@@ -144,7 +144,7 @@ footer{margin:60px 0 40px;color:var(--muted);font-size:14px}
   .rowact{justify-content:flex-start;margin-top:6px}
   .item{grid-template-columns:1fr}
   .item .ctrl{justify-content:flex-start}
-  .grid2,.kindpick{grid-template-columns:1fr}
+  .grid2{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion: reduce){ *{transition:none!important} }
 </style>
@@ -161,7 +161,7 @@ footer{margin:60px 0 40px;color:var(--muted);font-size:14px}
   </header>
   <main id="main"><div class="empty">Loading the schedule…</div></main>
   <footer>
-    <p>Give a talk: 30 minutes of presentation, 30 minutes of Q&amp;A, with pastries, bagels or other delicious surprises. Suggest a reading: a paper, a book chapter, a blog post, anything under the social epistemology banner.</p>
+    <p>Give a talk on your work, suggest a paper to read together, or bring a draft for the group to read. Pastries, bagels or other delicious surprises are usually involved.</p>
     <p id="authLine"></p>
   </footer>
 </div>
@@ -169,6 +169,10 @@ footer{margin:60px 0 40px;color:var(--muted);font-size:14px}
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script type="module">
+/* =====================================================================
+   SETUP: paste your Firebase web app config here (see README.md, step 2).
+   These values are not secret; the database rules protect the data.
+   ===================================================================== */
 const firebaseConfig = {
   apiKey: "AIzaSyAVL_wDhl5Ip_7ZkPQ2KZM2fK19nQHk4NY",
   authDomain: "serg-lse.firebaseapp.com",
@@ -181,10 +185,9 @@ const firebaseConfig = {
 /* ===================================================================== */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInAnonymously, GoogleAuthProvider, signInWithPopup, signOut,
-  sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInAnonymously, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 import { getFirestore, collection, doc, onSnapshot, getDoc, addDoc, updateDoc, setDoc, deleteDoc,
-  writeBatch, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+  writeBatch, serverTimestamp, query, orderBy, limit, getDocs, Bytes } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
 const S = {
   configured: !String(firebaseConfig.apiKey).startsWith('PASTE'),
@@ -200,7 +203,10 @@ const todayStr = () => isoD(new Date());
 const parseD = s => { const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); };
 const fmtLong = s => parseD(s).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
 const fmtShort = s => parseD(s).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
-const kindName = k => k==='talk' ? 'Talk' : 'Reading';
+const KIND = {talk:'Talk', reading:'Paper reading', draft:'Draft reading'};
+const kindName = k => KIND[k] || 'Reading';
+const isReadingKind = k => k==='reading' || k==='draft';
+const MAX_PDF = 8*1024*1024, CHUNK = 900000;
 const sRef = id => doc(db,'sessions',id), rRef = id => doc(db,'requests',id);
 
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),3400); }
@@ -215,7 +221,8 @@ function stateOf(s, list){
   const req = list.filter(i=>i.status==='pending' && i.sessionId===s.id);
   return req.length ? {k:'pending', req} : {k:'open'};
 }
-const allows = (s, kind) => !s.kind || s.kind==='any' || s.kind===kind;
+const allows = (s, kind) => !s.kind || s.kind==='any' || s.kind===kind || (s.kind==='reading' && isReadingKind(kind));
+const fileLink = x => x?.fileId ? ` <button class="linkbtn" data-file="${esc(x.fileId)}" data-fname="${esc(x.fileName||'reading.pdf')}">Download PDF</button>` : '';
 const bookable = kind => { const t=todayStr(); return sortedSessions().filter(s=>s.date>=t && !s.cancelled && !s.booking && (!kind || allows(s,kind))); };
 const sessionLabel = s => `Week ${s.week ?? '?'}, ${fmtShort(s.date)}${s.time? ', '+s.time:''}`;
 const canBook = () => !!S.uid;
@@ -257,7 +264,8 @@ function renderNext(list){
   let what;
   if (st.k==='booked'){ const b=st.b;
     what = b.kind==='talk' ? `<em>${esc(b.title)}</em>, a talk by ${esc(b.presenter||'TBC')}`
-      : `Reading: <em>${esc(b.title)}</em>${b.author?` by ${esc(b.author)}`:''}${b.link?` (<a href="${esc(b.link)}" target="_blank" rel="noopener">link</a>)`:''}`;
+      : b.kind==='draft' ? `Draft reading: <em>${esc(b.title)}</em> by ${esc(b.presenter||'TBC')}.${fileLink(b)}`
+      : `Reading: <em>${esc(b.title)}</em>${b.author?` by ${esc(b.author)}`:''}${b.link?` (<a href="${esc(b.link)}" target="_blank" rel="noopener">link</a>)`:''}.${fileLink(b)}`;
   } else what = `Nothing booked yet.${canBook()?` <button class="btn open small" data-book="${s.id}">Book this date</button>`:''}`;
   return `<div class="next ${st.k==='booked'?'':'open'}"><small>Next meeting, week ${esc(s.week ?? '?')}</small><div class="when">${fmtLong(s.date)}${where?`, ${where}`:''}</div><div class="what">${what}</div></div>`;
 }
@@ -279,10 +287,10 @@ function renderSchedule(){
       const st=stateOf(s,list), past=s.date<t; let content='', act='';
       if (st.k==='cancelled') content=`<span class="tag cancelled">No meeting</span>${s.notes?`<div class="who">${esc(s.notes)}</div>`:''}`;
       else if (st.k==='booked'){ const b=st.b;
-        content=`<span class="tag booked">${kindName(b.kind)}</span><div class="title">${b.link?`<a href="${esc(b.link)}" target="_blank" rel="noopener">${esc(b.title)}</a>`:esc(b.title)}</div><div class="who">${b.kind==='talk'?esc(b.presenter||'Speaker TBC'):[b.author,b.presenter&&`introduced by ${b.presenter}`].filter(Boolean).map(esc).join(', ')||'Group reading'}</div>`;
+        content=`<span class="tag booked">${kindName(b.kind)}</span><div class="title">${b.link?`<a href="${esc(b.link)}" target="_blank" rel="noopener">${esc(b.title)}</a>`:esc(b.title)}</div><div class="who">${b.kind==='talk'?esc(b.presenter||'Speaker TBC'):b.kind==='draft'?`Draft by ${esc(b.presenter||'TBC')}`:([b.author,b.presenter&&`introduced by ${b.presenter}`].filter(Boolean).map(esc).join(', ')||'Group reading')}${fileLink(b)}</div>`;
       } else if (st.k==='pending'){ const r=st.req[0];
         content=`<span class="tag pending">Requested, awaiting confirmation</span><div class="title">${esc(r.title)}</div><div class="who">${st.req.length>1?`${st.req.length} requests for this date`:esc(r.name||'')}</div>`;
-      } else content=`<span class="tag open">Free</span><div class="who">${s.kind==='talk'?'Open for a talk':s.kind==='reading'?'Open for a reading':'Open for a talk or a reading'}</div>`;
+      } else content=`<span class="tag open">Free</span><div class="who">${s.kind==='talk'?'Open for a talk':s.kind==='reading'?'Open for a paper or draft reading':'Open for a talk or a reading'}</div>`;
       if (!past && (st.k==='open'||st.k==='pending') && canBook()) act+=`<button class="btn ${st.k==='open'?'open':'ghost'} small" data-book="${s.id}">${st.k==='open'?'Book this date':'Request too'}</button>`;
       if (S.isAdmin){ if (st.k==='booked'&&!past) act+=`<button class="btn ghost small" data-announce="${s.id}">Announce</button>`; act+=`<button class="btn ghost small" data-edit="${s.id}">Edit</button>`; }
       html += `<div class="row ${st.k} ${past?'past':''}"><div class="wk"><span>Week</span>${esc(s.week ?? '–')}</div>
@@ -310,7 +318,8 @@ function renderAdmin(){
   const opts = it => { const c=free.filter(s=>allows(s,it.kind)); const req=S.sessions.find(s=>s.id===it.sessionId); if(req&&!c.includes(req)) c.unshift(req);
     return `<option value="">Choose a date…</option>`+c.map(s=>`<option value="${s.id}" ${s.id===it.sessionId?'selected':''}>${esc(sessionLabel(s))}${s.booking?' (taken)':''}</option>`).join(''); };
   const detail = it => it.kind==='talk' ? `Talk by ${esc(it.name||'—')}`
-    : `Suggested by ${esc(it.name||'anonymous')}. Author: ${esc(it.author||'—')}. Intro: ${it.intro==='yes'?'yes':'no'}. Lead discussion: ${it.lead==='yes'?'yes':'no'}${it.link?`. <a href="${esc(it.link)}" target="_blank" rel="noopener">Open link</a>`:''}`;
+    : it.kind==='draft' ? `Draft by ${esc(it.name||'—')}.${fileLink(it)||' No PDF attached.'}`
+    : `Suggested by ${esc(it.name||'anonymous')}. Author: ${esc(it.author||'—')}. Intro: ${it.intro==='yes'?'yes':'no'}. Lead discussion: ${it.lead==='yes'?'yes':'no'}${it.link?`. <a href="${esc(it.link)}" target="_blank" rel="noopener">Open link</a>`:''}.${fileLink(it)}`;
   const sent = it => new Date(it.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
   let html = `<div class="bar" style="margin-top:28px"><div class="actions"><button class="btn" data-act="term">Add a term of meetings</button><button class="btn ghost" data-act="one">Add one meeting</button><button class="btn ghost" data-announce="">Send an announcement</button><button class="btn ghost" data-act="settings">Settings</button></div></div>`;
   html += `<section class="block"><h2>Waiting for a decision</h2><p class="hint">Confirming a request books it onto the date you choose and shows it on the schedule.</p>`;
@@ -339,11 +348,11 @@ function sessionOptions(kind, sel, allowAny){
 function openBooking(sessionId, kind){
   const s=S.sessions.find(x=>x.id===sessionId);
   if (!kind) kind = s && s.kind && s.kind!=='any' ? s.kind : 'talk';
-  const both = !s || !s.kind || s.kind==='any';
+  const both = !s || !s.kind || s.kind==='any' || s.kind==='reading';
+  const pdfField = (label, help) => `<div class="field"><label for="f_pdf">${label}</label><span class="help">${help} PDF only, up to 8 MB. Anyone with the site link can download it.</span><input id="f_pdf" type="file" accept="application/pdf,.pdf"></div>`;
   const head = s ? `<p class="sub">${esc(sessionLabel(s))}${s.room?', '+esc(s.room):''}</p>` : `<p class="sub">An organiser will confirm your request.</p>`;
-  const pick = both ? `<div class="kindpick" role="group" aria-label="What would you like to book?">
-    <button type="button" data-kind="talk" aria-pressed="${kind==='talk'}"><strong>Give a talk</strong><span>30 min talk, 30 min Q&amp;A</span></button>
-    <button type="button" data-kind="reading" aria-pressed="${kind==='reading'}"><strong>Suggest a reading</strong><span>A paper, chapter or post to read together</span></button></div>` : '';
+  const choices=[['talk','Give a talk','Present your own work'],['reading','Paper reading','A published paper, chapter or post'],['draft','Draft reading','The group reads your work in progress']].filter(([k])=>!s||allows(s,k));
+  const pick = both && choices.length>1 ? `<div class="kindpick" role="group" aria-label="What would you like to book?">${choices.map(([k,t,d])=>`<button type="button" data-kind="${k}" aria-pressed="${kind===k}"><strong>${t}</strong><span>${d}</span></button>`).join('')}</div>` : '';
   const yn=(id,label)=>`<div class="field"><span class="lbl" id="${id}_l">${label}</span><div class="radios" role="radiogroup" aria-labelledby="${id}_l"><label><input type="radio" name="${id}" value="yes"> Yes</label><label><input type="radio" name="${id}" value="no"> No</label></div></div>`;
   const talk = `<div class="field"><label for="f_name">Name</label><input id="f_name" type="text" maxlength="120" autocomplete="name"></div>
     <div class="field"><label for="f_title">Talk title</label><span class="help">If you haven’t decided yet, type TBC.</span><input id="f_title" type="text" maxlength="300"></div>
@@ -352,32 +361,75 @@ function openBooking(sessionId, kind){
     <div class="field"><label for="f_title">Title of the reading</label><input id="f_title" type="text" maxlength="300"></div>
     <div class="field"><label for="f_author">Author</label><input id="f_author" type="text" maxlength="200"></div>
     <div class="field"><label for="f_link">Link to the reading</label><span class="help">If one is available.</span><input id="f_link" type="url" maxlength="500" placeholder="https://"></div>
+    ${pdfField('Or attach the PDF','Optional.')}
     <div class="field"><label for="f_date">Preferred date</label><select id="f_date">${sessionOptions('reading',sessionId,true)}</select></div>
     ${yn('f_intro','Would you be comfortable giving a brief 5-minute introduction before we begin the reading?')}
     ${yn('f_lead','Would you be comfortable leading the discussion for this session? (You don’t have to!)')}`;
-  openDlg(`<form id="bookForm" novalidate data-kind="${kind}" data-session="${esc(sessionId||'')}"><h3>${kind==='talk'?'Book a talk':'Suggest a reading'}</h3>${head}${pick}${kind==='talk'?talk:reading}
-    <p class="err" id="formErr" hidden></p><div class="foot"><div class="right"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn" type="submit">${kind==='talk'?'Send talk request':'Send reading suggestion'}</button></div></div></form>`);
+  const draft = `<div class="field"><label for="f_name">Name</label><input id="f_name" type="text" maxlength="120" autocomplete="name"></div>
+    <div class="field"><label for="f_title">Title of the draft</label><span class="help">A working title is fine.</span><input id="f_title" type="text" maxlength="300"></div>
+    ${pdfField('Attach the draft','You can also send it to the organisers later if it isn’t ready yet.')}
+    <div class="field"><label for="f_date">Date</label><select id="f_date">${sessionOptions('draft',sessionId,false)}</select></div>`;
+  const heading = {talk:'Book a talk', reading:'Suggest a paper reading', draft:'Book a draft reading'}[kind];
+  const sendLabel = {talk:'Send talk request', reading:'Send reading suggestion', draft:'Send draft reading request'}[kind];
+  openDlg(`<form id="bookForm" novalidate data-kind="${kind}" data-session="${esc(sessionId||'')}"><h3>${heading}</h3>${head}${pick}${kind==='talk'?talk:kind==='draft'?draft:reading}
+    <p class="err" id="formErr" hidden></p><div class="foot"><div class="right"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn" type="submit">${sendLabel}</button></div></div></form>`);
 }
 async function submitBooking(form){
   const kind=form.dataset.kind, err=$('#formErr'); err.hidden=true;
   const v=id=>($('#'+id)?.value||'').trim(), radio=n=>form.querySelector(`input[name="${n}"]:checked`)?.value||'';
-  const data={kind, name:v('f_name'), title:v('f_title'), author:'', link:'', intro:'', lead:'', sessionId:v('f_date')||null};
+  const data={kind, name:v('f_name'), title:v('f_title'), author:'', link:'', intro:'', lead:'', sessionId:v('f_date')||null, fileId:null, fileName:''};
+  const pdf=$('#f_pdf')?.files?.[0] || null;
   const miss=[];
-  if (kind==='talk'){ if(!data.name) miss.push('your name'); if(!data.title) miss.push('a talk title (or TBC)'); if(!data.sessionId) miss.push('a date'); }
+  if (pdf && !(pdf.type==='application/pdf' || /\.pdf$/i.test(pdf.name))){ err.textContent='The attachment must be a PDF.'; err.hidden=false; return; }
+  if (pdf && pdf.size>MAX_PDF){ err.textContent=`That PDF is ${(pdf.size/1048576).toFixed(1)} MB. The limit is 8 MB; try exporting a smaller version.`; err.hidden=false; return; }
+  if (kind==='talk' || kind==='draft'){ if(!data.name) miss.push('your name'); if(!data.title) miss.push(kind==='talk'?'a talk title (or TBC)':'a title'); if(!data.sessionId) miss.push('a date'); }
   else { data.author=v('f_author'); data.link=v('f_link'); data.intro=radio('f_intro'); data.lead=radio('f_lead');
     if(!data.title) miss.push('the title'); if(!data.author) miss.push('the author');
     if(!data.intro) miss.push('whether you’d give an introduction'); if(!data.lead) miss.push('whether you’d lead the discussion');
     if (data.link && !/^https?:\/\//i.test(data.link)) data.link='https://'+data.link; }
   if (miss.length){ err.textContent='Add '+miss.join(', ')+' to send this.'; err.hidden=false; return; }
   const btn=form.querySelector('[type=submit]'); btn.disabled=true;
-  try{ await addDoc(collection(db,'requests'), {...data, uid:S.uid, status:'pending', createdAt:serverTimestamp()});
-    closeDlg(); toast(kind==='talk'?'Talk request sent. An organiser will confirm it.':'Reading suggestion sent. Thank you!');
-  }catch(e){ console.error(e); btn.disabled=false; err.textContent='That didn’t send. Check your connection and try again.'; err.hidden=false; }
+  try{
+    if (pdf){ data.fileId = await uploadPdf(pdf, n=>{ btn.textContent = `Uploading PDF… ${n}%`; }); data.fileName = pdf.name.slice(0,200); }
+    btn.textContent='Sending…';
+    await addDoc(collection(db,'requests'), {...data, uid:S.uid, status:'pending', createdAt:serverTimestamp()});
+    closeDlg(); toast(kind==='reading'?'Reading suggestion sent. Thank you!':'Request sent. An organiser will confirm it.');
+  }catch(e){ console.error(e); btn.disabled=false; btn.textContent='Try again'; err.textContent='That didn’t send. Check your connection and try again.'; err.hidden=false; }
 }
-async function withdraw(id){ if(!confirm('Withdraw this request?')) return; try{ await deleteDoc(rRef(id)); toast('Request withdrawn.'); }catch(e){ fail(e); } }
+async function withdraw(id){ if(!confirm('Withdraw this request?')) return;
+  const it=S.requests.find(r=>r.id===id);
+  try{ await deleteDoc(rRef(id)); if (it?.fileId) await deletePdf(it.fileId).catch(console.error); toast('Request withdrawn.'); }catch(e){ fail(e); } }
+
+/* ---------- PDF attachments (stored in the database in pieces of up to 900 KB) ---------- */
+async function uploadPdf(file, progress){
+  const buf=new Uint8Array(await file.arrayBuffer()), chunks=Math.ceil(buf.length/CHUNK);
+  const meta=await addDoc(collection(db,'files'), {name:file.name.slice(0,200), size:buf.length, chunks, type:'application/pdf', uid:S.uid, createdAt:serverTimestamp()});
+  for (let i=0;i<chunks;i++){
+    await setDoc(doc(db,'files',meta.id,'chunks',String(i)), {data:Bytes.fromUint8Array(buf.subarray(i*CHUNK,(i+1)*CHUNK))});
+    progress && progress(Math.round((i+1)/chunks*100));
+  }
+  return meta.id;
+}
+async function downloadPdf(fileId, name, btn){
+  const label=btn?.textContent; if(btn){ btn.disabled=true; btn.textContent='Downloading…'; }
+  try{
+    const snap=await getDocs(collection(db,'files',fileId,'chunks'));
+    const parts=snap.docs.sort((a,b)=>Number(a.id)-Number(b.id)).map(d=>d.data().data.toUint8Array());
+    if(!parts.length) throw new Error('empty');
+    const url=URL.createObjectURL(new Blob(parts,{type:'application/pdf'}));
+    const a=document.createElement('a'); a.href=url; a.download=/\.pdf$/i.test(name)?name:name+'.pdf'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 60000);
+  }catch(e){ console.error(e); toast('The PDF couldn’t be downloaded. It may have been removed.'); }
+  finally{ if(btn){ btn.disabled=false; btn.textContent=label; } }
+}
+async function deletePdf(fileId){
+  const snap=await getDocs(collection(db,'files',fileId,'chunks'));
+  for (const d of snap.docs) await deleteDoc(d.ref);
+  await deleteDoc(doc(db,'files',fileId));
+}
 
 /* ---------- organiser actions (the database rules enforce these, not the page) ---------- */
-const bookingFrom = it => ({requestId:it.id, kind:it.kind, title:it.title||'', author:it.author||'', link:it.link||'', presenter:it.name||'', intro:it.intro||'', lead:it.lead||''});
+const bookingFrom = it => ({requestId:it.id, kind:it.kind, title:it.title||'', author:it.author||'', link:it.link||'', presenter:it.name||'', intro:it.intro||'', lead:it.lead||'', fileId:it.fileId||null, fileName:it.fileName||''});
 const reqExists = id => S.requests.some(r=>r.id===id);
 function clearBookingsOf(b, id, exceptSid){ for (const o of S.sessions) if (o.id!==exceptSid && o.booking?.requestId===id) b.update(sRef(o.id),{booking:null}); }
 async function approve(id, sid){
@@ -394,7 +446,8 @@ async function approve(id, sid){
 }
 async function decline(id){ const b=writeBatch(db); clearBookingsOf(b,id,null); b.update(rRef(id),{status:'declined',assignedSession:null}); try{ await b.commit(); toast('Request declined.'); }catch(e){ fail(e); } }
 async function reopen(id){ const b=writeBatch(db); clearBookingsOf(b,id,null); b.update(rRef(id),{status:'pending',assignedSession:null}); try{ await b.commit(); toast('Moved back to waiting.'); }catch(e){ fail(e); } }
-async function removeReq(id){ if(!confirm('Delete this request permanently?')) return; const b=writeBatch(db); clearBookingsOf(b,id,null); b.delete(rRef(id)); try{ await b.commit(); toast('Request deleted.'); }catch(e){ fail(e); } }
+async function removeReq(id){ if(!confirm('Delete this request permanently?')) return; const b=writeBatch(db); clearBookingsOf(b,id,null); b.delete(rRef(id)); const f=S.requests.find(r=>r.id===id)?.fileId;
+  try{ await b.commit(); if(f) await deletePdf(f).catch(console.error); toast('Request deleted.'); }catch(e){ fail(e); } }
 
 function openSessionEditor(id){
   const s=id?S.sessions.find(x=>x.id===id):null, st=S.settings, last=sortedSessions().slice(-1)[0];
@@ -403,7 +456,7 @@ function openSessionEditor(id){
     <div class="grid2"><div class="field"><label for="s_date">Date</label><input id="s_date" type="date" value="${esc(d.date)}" ${s?'disabled':''}></div><div class="field"><label for="s_week">Week number</label><input id="s_week" type="number" min="0" max="60" value="${esc(d.week)}"></div></div>
     <div class="grid2"><div class="field"><label for="s_time">Time</label><input id="s_time" type="text" placeholder="13:00–14:00" value="${esc(d.time)}"></div><div class="field"><label for="s_room">Room</label><input id="s_room" type="text" value="${esc(d.room)}"></div></div>
     <div class="grid2"><div class="field"><label for="s_term">Term</label><input id="s_term" type="text" placeholder="Michaelmas Term 2026" value="${esc(d.term)}"></div>
-    <div class="field"><label for="s_kind">Open for</label><select id="s_kind">${[['any','Talk or reading'],['talk','Talks only'],['reading','Readings only']].map(([v,l])=>`<option value="${v}" ${d.kind===v?'selected':''}>${l}</option>`).join('')}</select></div></div>
+    <div class="field"><label for="s_kind">Open for</label><select id="s_kind">${[['any','Talk or reading'],['talk','Talks only'],['reading','Readings only (paper or draft)']].map(([v,l])=>`<option value="${v}" ${d.kind===v?'selected':''}>${l}</option>`).join('')}</select></div></div>
     <div class="field"><label class="check"><input id="s_cancel" type="checkbox" ${d.cancelled?'checked':''}> No meeting this week</label></div>
     <div class="field"><label for="s_notes">Note shown on the schedule</label><input id="s_notes" type="text" placeholder="e.g. Reading week" value="${esc(d.notes)}"></div>
     ${s?.booking?`<div class="notice" style="margin:0 0 16px">Booked: ${kindName(s.booking.kind)}, “${esc(s.booking.title)}”. <button type="button" class="linkbtn" data-unbook="${s.id}">Remove booking</button></div>`:''}
@@ -445,7 +498,7 @@ function openTerm(){
     <div class="grid2"><div class="field"><label for="t_first">Date of the first meeting</label><input id="t_first" type="date"></div><div class="field"><label for="t_w1">Its week number</label><input id="t_w1" type="number" min="0" max="60" value="1"></div></div>
     <div class="grid2"><div class="field"><label for="t_wn">Last week number</label><input id="t_wn" type="number" min="0" max="60" value="10"></div><div class="field"><label for="t_skip">Weeks with no meeting</label><input id="t_skip" type="text" placeholder="6"></div></div>
     <div class="grid2"><div class="field"><label for="t_time">Time</label><input id="t_time" type="text" placeholder="13:00–14:00" value="${esc(st.defaultTime||'')}"></div><div class="field"><label for="t_room">Room</label><input id="t_room" type="text" value="${esc(st.defaultRoom||'')}"></div></div>
-    <div class="field"><label for="t_kind">Open for</label><select id="t_kind"><option value="any">Talk or reading</option><option value="talk">Talks only</option><option value="reading">Readings only</option></select></div>
+    <div class="field"><label for="t_kind">Open for</label><select id="t_kind"><option value="any">Talk or reading</option><option value="talk">Talks only</option><option value="reading">Readings only (paper or draft)</option></select></div>
     <p class="err" id="formErr" hidden></p><div class="foot"><div class="right"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn" type="submit">Add meetings</button></div></div></form>`);
 }
 async function saveTerm(form){
@@ -483,11 +536,14 @@ function buildAnnouncement(s){
   let subject, lead;
   if (b.kind==='talk'){
     subject=`SERG week ${s.week ?? ''}: “${b.title}” by ${b.presenter||'TBC'} (${fmtShort(s.date)})`;
-    lead=`At this week’s Social Epistemology Reading Group, ${b.presenter||'our speaker'} will present “${b.title}”.\n\nThe format is a 30-minute talk followed by 30 minutes of Q&A, with pastries, bagels or other delicious surprises.`;
+    lead=`At this week’s Social Epistemology Reading Group, ${b.presenter||'our speaker'} will present “${b.title}”.\n\nThere will be pastries, bagels or other delicious surprises.`;
+  } else if (b.kind==='draft'){
+    subject=`SERG week ${s.week ?? ''}: draft reading, “${b.title}” by ${b.presenter||'TBC'} (${fmtShort(s.date)})`;
+    lead=`This week at the Social Epistemology Reading Group we’ll read and discuss a draft by ${b.presenter||'one of our members'}, “${b.title}”.${b.fileId?'\n\nYou can download the draft from the schedule on the SERG site (link below).':''}`;
   } else {
     subject=`SERG week ${s.week ?? ''}: reading “${b.title}” (${fmtShort(s.date)})`;
     const roles=[b.intro==='yes'&&'give a short introduction', b.lead==='yes'&&'lead the discussion'].filter(Boolean);
-    lead=`This week at the Social Epistemology Reading Group we’ll read “${b.title}”${b.author?` by ${b.author}`:''}.${b.link?`\n\nYou can find it here: ${b.link}`:''}${b.presenter&&roles.length?`\n\n${b.presenter} will ${roles.join(' and ')}.`:''}`;
+    lead=`This week at the Social Epistemology Reading Group we’ll read “${b.title}”${b.author?` by ${b.author}`:''}.${b.link?`\n\nYou can find it here: ${b.link}`:''}${b.fileId?'\n\nA PDF is available to download from the schedule on the SERG site (link below).':''}${b.presenter&&roles.length?`\n\n${b.presenter} will ${roles.join(' and ')}.`:''}`;
   }
   const link=st.siteLink||location.origin+location.pathname;
   return {subject, body:`Hi all,\n\n${lead}\n\nWhen: ${when}\nWhere: ${s.room||'TBC'}\n\nSee the full schedule, book a slot to present, or suggest a reading: ${link}\n\nBest,\n${st.signoff||'The SERG organisers'}`};
@@ -512,19 +568,11 @@ async function copyField(id){ const el=$('#'+id);
 
 /* ---------- organiser sign-in ---------- */
 function openSignIn(){
-  openDlg(`<form id="signForm"><h3>Organiser sign-in</h3><p class="sub">Only for organisers. Attendees don’t need to sign in to book.</p>
-    <p><button type="button" class="btn" data-act="google">Sign in with Google</button></p>
-    <div class="field" style="margin-top:20px"><label for="e_mail">Or get a sign-in link by email</label><span class="help">Works with any address, including @lse.ac.uk.</span><input id="e_mail" type="email" autocomplete="email"></div>
+  openDlg(`<div><h3>Organiser sign-in</h3><p class="sub">Only for organisers. Attendees don’t need to sign in to book.</p>
     <p class="err" id="formErr" hidden></p>
-    <div class="foot"><div class="right"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn ghost" type="submit">Email me a link</button></div></div></form>`);
+    <div class="foot"><div class="right"><button type="button" class="btn ghost" data-close>Cancel</button><button type="button" class="btn" data-act="google">Sign in with Google</button></div></div></div>`);
 }
 async function googleSignIn(){ try{ await signInWithPopup(auth, new GoogleAuthProvider()); closeDlg(); }catch(e){ console.error(e); const err=$('#formErr'); if(err){ err.textContent = e.code==='auth/unauthorized-domain' ? 'This web address isn’t on the authorised domains list in Firebase (see README step 7).' : 'Sign-in didn’t complete. Try again.'; err.hidden=false; } } }
-async function emailLink(){
-  const email=$('#e_mail').value.trim(), err=$('#formErr'); if(!email){ err.textContent='Enter your email address.'; err.hidden=false; return; }
-  try{ await sendSignInLinkToEmail(auth, email, {url: location.origin+location.pathname, handleCodeInApp:true}); try{ localStorage.setItem('sergSignInEmail', email); }catch(_){}
-    closeDlg(); toast(`Sign-in link sent to ${email}. Open it on this device.`);
-  }catch(e){ console.error(e); err.textContent='The link couldn’t be sent. Check the address, and that email-link sign-in is enabled in Firebase.'; err.hidden=false; }
-}
 
 /* ---------- events ---------- */
 document.addEventListener('click', e=>{
@@ -541,6 +589,7 @@ document.addEventListener('click', e=>{
   if (d.close!==undefined){ closeDlg(); return; }
   if (d.withdraw){ withdraw(d.withdraw); return; }
   if (d.copy){ copyField(d.copy); return; }
+  if (d.file){ downloadPdf(d.file, d.fname||'reading.pdf', t); return; }
   if (!S.isAdmin) return;
   if (d.approve){ approve(d.approve, $(`select[data-pick="${d.approve}"]`)?.value); return; }
   if (d.decline){ decline(d.decline); return; }
@@ -556,7 +605,7 @@ document.addEventListener('click', e=>{
 });
 document.addEventListener('submit', e=>{ e.preventDefault(); const f=e.target;
   if (f.id==='bookForm') submitBooking(f); else if (f.id==='sessForm') saveSession(f); else if (f.id==='termForm') saveTerm(f);
-  else if (f.id==='setForm') saveSettings(); else if (f.id==='signForm') emailLink(); });
+  else if (f.id==='setForm') saveSettings(); });
 document.addEventListener('input', e=>{ if(e.target.id==='a_subj'||e.target.id==='a_body') updateMailto(); });
 document.addEventListener('change', e=>{ if(e.target.id==='a_sess') openAnnounce(e.target.value); });
 
@@ -565,14 +614,6 @@ async function start(){
   render();
   if (!S.configured) return;
   app=initializeApp(firebaseConfig); auth=getAuth(app); db=getFirestore(app);
-
-  if (isSignInWithEmailLink(auth, location.href)){
-    let email=null; try{ email=localStorage.getItem('sergSignInEmail'); }catch(_){}
-    if (!email) email=prompt('Confirm your email address to finish signing in');
-    try{ if(email) await signInWithEmailLink(auth, email, location.href); try{ localStorage.removeItem('sergSignInEmail'); }catch(_){} }
-    catch(e){ console.error(e); toast('That sign-in link has expired or was already used. Request a new one.'); }
-    history.replaceState(null,'',location.pathname);
-  }
 
   onAuthStateChanged(auth, async u=>{
     if (!u){ S.uid=null; S.isAdmin=false; S.email=null; S.isAnon=true; render();
