@@ -160,10 +160,6 @@ footer{margin:60px 0 40px;color:var(--muted);font-size:14px}
     <nav class="tabs" role="tablist" id="tabs"></nav>
   </header>
   <main id="main"><div class="empty">Loading the schedule…</div></main>
-  <footer>
-    <p>Give a talk on your work, suggest a paper to read together, or bring a draft for the group to read. Pastries, bagels or other delicious surprises are usually involved.</p>
-    <p id="authLine"></p>
-  </footer>
 </div>
 <dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
 <div id="toast" role="status" aria-live="polite"></div>
@@ -495,8 +491,8 @@ function openTerm(){
   const st=S.settings;
   openDlg(`<form id="termForm"><h3>Add a term of meetings</h3><p class="sub">Creates one meeting a week. Dates that already exist are left alone.</p>
     <div class="field"><label for="t_term">Term name</label><input id="t_term" type="text" placeholder="Michaelmas Term 2026"></div>
-    <div class="grid2"><div class="field"><label for="t_first">Date of the first meeting</label><input id="t_first" type="date"></div><div class="field"><label for="t_w1">Its week number</label><input id="t_w1" type="number" min="0" max="60" value="1"></div></div>
-    <div class="grid2"><div class="field"><label for="t_wn">Last week number</label><input id="t_wn" type="number" min="0" max="60" value="10"></div><div class="field"><label for="t_skip">Weeks with no meeting</label><input id="t_skip" type="text" placeholder="6"></div></div>
+    <div class="grid2"><div class="field"><label for="t_first">Date of the first meeting</label><input id="t_first" type="date"></div><div class="field"><label for="t_w1">Its week number</label><input id="t_w1" type="number" min="0" max="60" value="2"></div></div>
+    <div class="grid2"><div class="field"><label for="t_wn">Last week number</label><input id="t_wn" type="number" min="0" max="60" value="11"></div><div class="field"><label for="t_skip">Weeks with no meeting</label><input id="t_skip" type="text" placeholder="6"></div></div>
     <div class="grid2"><div class="field"><label for="t_time">Time</label><input id="t_time" type="text" placeholder="13:00–14:00" value="${esc(st.defaultTime||'')}"></div><div class="field"><label for="t_room">Room</label><input id="t_room" type="text" value="${esc(st.defaultRoom||'')}"></div></div>
     <div class="field"><label for="t_kind">Open for</label><select id="t_kind"><option value="any">Talk or reading</option><option value="talk">Talks only</option><option value="reading">Readings only (paper or draft)</option></select></div>
     <p class="err" id="formErr" hidden></p><div class="foot"><div class="right"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn" type="submit">Add meetings</button></div></div></form>`);
