@@ -86,6 +86,7 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(-
 .content{min-width:0}
 .content .title{font:400 18px/1.35 var(--serif);overflow-wrap:anywhere}
 .content .who{color:var(--muted);font-size:14px}
+.bookeditem+.bookeditem{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
 .tag{display:inline-block;font-size:13px;font-weight:600;padding:2px 8px;border-radius:0;margin-bottom:4px}
 .tag.open{background:transparent;color:var(--ink);border:1px solid var(--ink)}
 .tag.pending{background:var(--pending-bg);color:var(--ink);border:1px dashed var(--ink)}
@@ -120,6 +121,7 @@ dialog::backdrop{background:rgba(10,14,20,.45)}
 input[type=file]{width:100%;padding:8px 0}
 input[type=text],input[type=email],input[type=url],input[type=date],input[type=number],select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:0;background:var(--paper)}
 textarea{min-height:190px;resize:vertical;font-size:15px}
+textarea.note{min-height:80px}
 .radios{display:flex;gap:18px}
 .radios label{font-weight:400;display:flex;align-items:center;gap:6px;cursor:pointer}
 .kindpick{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:18px}
@@ -215,15 +217,22 @@ function fail(e){ console.error(e); toast(e?.code==='permission-denied' ? 'You d
 /* ---------- derived data ---------- */
 const items = () => [...S.requests].sort((a,b)=>a.createdAt-b.createdAt);
 const sortedSessions = () => [...S.sessions].sort((a,b)=>(a.date+(a.time||'')).localeCompare(b.date+(b.time||'')));
+function bookingsMapOf(s){
+  const map=s?.bookings && typeof s.bookings==='object' ? {...s.bookings} : {};
+  if (s?.booking?.requestId && !map[s.booking.requestId]) map[s.booking.requestId]=s.booking;
+  return map;
+}
+function bookingsOf(s){ return Object.entries(bookingsMapOf(s)).filter(([,b])=>b).map(([rid,b])=>({requestId:rid, ...b})); }
 function stateOf(s, list){
   if (s.cancelled) return {k:'cancelled'};
-  if (s.booking) return {k:'booked', b:s.booking};
+  const bookings=bookingsOf(s);
   const req = list.filter(i=>i.status==='pending' && i.sessionId===s.id);
+  if (bookings.length) return {k:'booked', bookings, req};
   return req.length ? {k:'pending', req} : {k:'open'};
 }
 const allows = (s, kind) => !s.kind || s.kind==='any' || s.kind===kind || (s.kind==='reading' && isReadingKind(kind));
 const fileLink = x => x?.fileId ? ` <button class="linkbtn" data-file="${esc(x.fileId)}" data-fname="${esc(x.fileName||'reading.pdf')}">Download PDF</button>` : '';
-const bookable = kind => { const t=todayStr(); return sortedSessions().filter(s=>s.date>=t && !s.cancelled && !s.booking && (!kind || allows(s,kind))); };
+const requestable = kind => { const t=todayStr(); return sortedSessions().filter(s=>s.date>=t && !s.cancelled && (!kind || allows(s,kind))); };
 const sessionLabel = s => `Week ${s.week ?? '?'}, ${fmtShort(s.date)}${s.time? ', '+s.time:''}`;
 const canBook = () => !!S.uid;
 
@@ -261,12 +270,13 @@ function renderNext(list){
   const t=todayStr(), s=sortedSessions().find(x=>x.date>=t && !x.cancelled);
   if (!s) return '';
   const st=stateOf(s,list), where=[s.time,s.room].filter(Boolean).map(esc).join(', ');
+  const item = b => b.kind==='talk' ? `<em>${esc(b.title)}</em>, a talk by ${esc(b.presenter||'TBC')}`
+    : b.kind==='draft' ? `Draft reading: <em>${esc(b.title)}</em> by ${esc(b.presenter||'TBC')}.${fileLink(b)}`
+    : `Reading: <em>${esc(b.title)}</em>${b.author?` by ${esc(b.author)}`:''}${b.link?` (<a href="${esc(b.link)}" target="_blank" rel="noopener">link</a>)`:''}.${fileLink(b)}`;
+  const extra = b => `${b.notes?` <div class="who">${esc(b.notes)}</div>`:''}${b.zoom?` <div class="who">Zoom: <a href="${esc(b.zoom)}" target="_blank" rel="noopener">${esc(b.zoom)}</a></div>`:''}`;
   let what;
-  if (st.k==='booked'){ const b=st.b;
-    what = b.kind==='talk' ? `<em>${esc(b.title)}</em>, a talk by ${esc(b.presenter||'TBC')}`
-      : b.kind==='draft' ? `Draft reading: <em>${esc(b.title)}</em> by ${esc(b.presenter||'TBC')}.${fileLink(b)}`
-      : `Reading: <em>${esc(b.title)}</em>${b.author?` by ${esc(b.author)}`:''}${b.link?` (<a href="${esc(b.link)}" target="_blank" rel="noopener">link</a>)`:''}.${fileLink(b)}`;
-  } else what = `Nothing booked yet.${canBook()?` <button class="btn open small" data-book="${s.id}">Book this date</button>`:''}`;
+  if (st.k==='booked'){ what = st.bookings.map(b=>item(b)+extra(b)).join('<hr style="border:0;border-top:1px solid var(--line);margin:8px 0">'); }
+  else what = `Nothing booked yet.${canBook()?` <button class="btn open small" data-book="${s.id}">Book this date</button>`:''}`;
   return `<div class="next ${st.k==='booked'?'':'open'}"><small>Next meeting, week ${esc(s.week ?? '?')}</small><div class="when">${fmtLong(s.date)}${where?`, ${where}`:''}</div><div class="what">${what}</div></div>`;
 }
 function renderSchedule(){
@@ -286,13 +296,18 @@ function renderSchedule(){
     for (const s of g){
       const st=stateOf(s,list), past=s.date<t; let content='', act='';
       if (st.k==='cancelled') content=`<span class="tag cancelled">No meeting</span>${s.notes?`<div class="who">${esc(s.notes)}</div>`:''}`;
-      else if (st.k==='booked'){ const b=st.b;
-        content=`<span class="tag booked">${kindName(b.kind)}</span><div class="title">${b.link?`<a href="${esc(b.link)}" target="_blank" rel="noopener">${esc(b.title)}</a>`:esc(b.title)}</div><div class="who">${b.kind==='talk'?esc(b.presenter||'Speaker TBC'):b.kind==='draft'?`Draft by ${esc(b.presenter||'TBC')}`:([b.author,b.presenter&&`introduced by ${b.presenter}`].filter(Boolean).map(esc).join(', ')||'Group reading')}${fileLink(b)}</div>`;
+      else if (st.k==='booked'){
+        content=st.bookings.map(b=>`<div class="bookeditem"><span class="tag booked">${kindName(b.kind)}</span><div class="title">${b.link?`<a href="${esc(b.link)}" target="_blank" rel="noopener">${esc(b.title)}</a>`:esc(b.title)}</div><div class="who">${b.kind==='talk'?esc(b.presenter||'Speaker TBC'):b.kind==='draft'?`Draft by ${esc(b.presenter||'TBC')}`:([b.author,b.presenter&&`introduced by ${b.presenter}`].filter(Boolean).map(esc).join(', ')||'Group reading')}${fileLink(b)}</div>${b.notes?`<div class="who">${esc(b.notes)}</div>`:''}${b.zoom?`<div class="who">Zoom: <a href="${esc(b.zoom)}" target="_blank" rel="noopener">${esc(b.zoom)}</a></div>`:''}</div>`).join('');
+        if (st.req.length) content+=`<div class="who" style="margin-top:6px">${st.req.length} more request${st.req.length>1?'s':''} awaiting confirmation</div>`;
       } else if (st.k==='pending'){ const r=st.req[0];
         content=`<span class="tag pending">Requested, awaiting confirmation</span><div class="title">${esc(r.title)}</div><div class="who">${st.req.length>1?`${st.req.length} requests for this date`:esc(r.name||'')}</div>`;
       } else content=`<span class="tag open">Free</span><div class="who">${s.kind==='talk'?'Open for a talk':s.kind==='reading'?'Open for a paper or draft reading':'Open for a talk or a reading'}</div>`;
-      if (!past && (st.k==='open'||st.k==='pending') && canBook()) act+=`<button class="btn ${st.k==='open'?'open':'ghost'} small" data-book="${s.id}">${st.k==='open'?'Book this date':'Request too'}</button>`;
-      if (S.isAdmin){ if (st.k==='booked'&&!past) act+=`<button class="btn ghost small" data-announce="${s.id}">Announce</button>`; act+=`<button class="btn ghost small" data-edit="${s.id}">Edit</button>`; }
+      if (!past && st.k!=='cancelled' && canBook()) act+=`<button class="btn ${st.k==='open'?'open':'ghost'} small" data-book="${s.id}">${st.k==='open'?'Book this date':'Request too'}</button>`;
+      if (S.isAdmin){
+        if (st.k==='booked'&&!past) act+=`<button class="btn ghost small" data-announce="${s.id}">Announce</button>`;
+        if (st.k==='booked') act+=st.bookings.map(b=>`<button class="btn ghost small" data-editbooking="${s.id}" data-req="${esc(b.requestId)}">Details</button>`).join('');
+        act+=`<button class="btn ghost small" data-edit="${s.id}">Edit</button>`;
+      }
       html += `<div class="row ${st.k} ${past?'past':''}"><div class="wk"><span>Week</span>${esc(s.week ?? '–')}</div>
         <div class="date"><strong>${fmtShort(s.date)}</strong><span>${[s.time,s.room].filter(Boolean).map(esc).join(', ')}</span></div>
         <div class="content">${content}</div><div class="rowact">${act}</div></div>`;
@@ -311,15 +326,16 @@ function statusText(it){
 function renderMine(){
   const mine=items().filter(i=>i.uid===S.uid).reverse();
   return `<section class="block"><h2>My requests</h2><p class="hint">Requests sent from this browser. Organisers confirm each one; you can withdraw a request until it’s confirmed.</p><div class="list">` +
-    mine.map(it=>`<div class="item"><div><div class="meta">${kindName(it.kind)}</div><div class="title">${esc(it.title)}</div><div class="meta">${statusText(it)}</div></div><div class="ctrl">${it.status==='pending'?`<button class="btn ghost small" data-withdraw="${it.id}">Withdraw</button>`:''}</div></div>`).join('') + `</div></section>`;
+    mine.map(it=>`<div class="item"><div><div class="meta">${kindName(it.kind)}</div><div class="title">${esc(it.title)}</div>${it.notes?`<div class="meta">Note: ${esc(it.notes)}</div>`:''}<div class="meta">${statusText(it)}</div></div><div class="ctrl">${it.status==='pending'?`<button class="btn ghost small" data-withdraw="${it.id}">Withdraw</button>`:''}</div></div>`).join('') + `</div></section>`;
 }
 function renderAdmin(){
-  const list=items(), pending=list.filter(i=>i.status==='pending'), decided=list.filter(i=>i.status!=='pending').reverse(), free=bookable();
-  const opts = it => { const c=free.filter(s=>allows(s,it.kind)); const req=S.sessions.find(s=>s.id===it.sessionId); if(req&&!c.includes(req)) c.unshift(req);
-    return `<option value="">Choose a date…</option>`+c.map(s=>`<option value="${s.id}" ${s.id===it.sessionId?'selected':''}>${esc(sessionLabel(s))}${s.booking?' (taken)':''}</option>`).join(''); };
-  const detail = it => it.kind==='talk' ? `Talk by ${esc(it.name||'—')}`
+  const list=items(), pending=list.filter(i=>i.status==='pending'), decided=list.filter(i=>i.status!=='pending').reverse();
+  const opts = it => { const c=requestable(it.kind); const req=S.sessions.find(s=>s.id===it.sessionId); if(req&&!c.includes(req)) c.unshift(req);
+    return `<option value="">Choose a date…</option>`+c.map(s=>`<option value="${s.id}" ${s.id===it.sessionId?'selected':''}>${esc(sessionLabel(s))}${bookingsOf(s).length?' (has bookings)':''}</option>`).join(''); };
+  const detail = it => (it.kind==='talk' ? `Talk by ${esc(it.name||'—')}`
     : it.kind==='draft' ? `Draft by ${esc(it.name||'—')}.${fileLink(it)||' No PDF attached.'}`
-    : `Suggested by ${esc(it.name||'anonymous')}. Author: ${esc(it.author||'—')}. Intro: ${it.intro==='yes'?'yes':'no'}. Lead discussion: ${it.lead==='yes'?'yes':'no'}${it.link?`. <a href="${esc(it.link)}" target="_blank" rel="noopener">Open link</a>`:''}.${fileLink(it)}`;
+    : `Suggested by ${esc(it.name||'anonymous')}. Author: ${esc(it.author||'—')}. Intro: ${it.intro==='yes'?'yes':'no'}. Lead discussion: ${it.lead==='yes'?'yes':'no'}${it.link?`. <a href="${esc(it.link)}" target="_blank" rel="noopener">Open link</a>`:''}.${fileLink(it)}`)
+    + (it.notes?`<br>Note: ${esc(it.notes)}`:'');
   const sent = it => new Date(it.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
   let html = `<div class="bar" style="margin-top:28px"><div class="actions"><button class="btn" data-act="term">Add a term of meetings</button><button class="btn ghost" data-act="one">Add one meeting</button><button class="btn ghost" data-announce="">Send an announcement</button><button class="btn ghost" data-act="settings">Settings</button></div></div>`;
   html += `<section class="block"><h2>Waiting for a decision</h2><p class="hint">Confirming a request books it onto the date you choose and shows it on the schedule.</p>`;
@@ -342,7 +358,7 @@ const closeDlg = () => dlg.close();
 dlg.addEventListener('click', e=>{ if(e.target===dlg) closeDlg(); });
 
 function sessionOptions(kind, sel, allowAny){
-  const list=bookable(kind), extra = sel && !list.find(s=>s.id===sel) ? S.sessions.filter(s=>s.id===sel) : [];
+  const list=requestable(kind), extra = sel && !list.find(s=>s.id===sel) ? S.sessions.filter(s=>s.id===sel) : [];
   return (allowAny?`<option value="">Any date that suits the group</option>`:`<option value="">Choose a date…</option>`) + [...extra,...list].map(s=>`<option value="${s.id}" ${s.id===sel?'selected':''}>${esc(sessionLabel(s))}</option>`).join('');
 }
 function openBooking(sessionId, kind){
@@ -354,20 +370,24 @@ function openBooking(sessionId, kind){
   const choices=[['talk','Give a talk','Present your own work'],['reading','Paper reading','A published paper, chapter or post'],['draft','Draft reading','The group reads your work in progress']].filter(([k])=>!s||allows(s,k));
   const pick = both && choices.length>1 ? `<div class="kindpick" role="group" aria-label="What would you like to book?">${choices.map(([k,t,d])=>`<button type="button" data-kind="${k}" aria-pressed="${kind===k}"><strong>${t}</strong><span>${d}</span></button>`).join('')}</div>` : '';
   const yn=(id,label)=>`<div class="field"><span class="lbl" id="${id}_l">${label}</span><div class="radios" role="radiogroup" aria-labelledby="${id}_l"><label><input type="radio" name="${id}" value="yes"> Yes</label><label><input type="radio" name="${id}" value="no"> No</label></div></div>`;
+  const noteField = `<div class="field"><label for="f_notes">Notes <span class="help" style="display:inline">(optional)</span></label><span class="help">Anything the group should know — it will appear on the schedule.</span><textarea class="note" id="f_notes" maxlength="500"></textarea></div>`;
   const talk = `<div class="field"><label for="f_name">Name</label><input id="f_name" type="text" maxlength="120" autocomplete="name"></div>
     <div class="field"><label for="f_title">Talk title</label><span class="help">If you haven’t decided yet, type TBC.</span><input id="f_title" type="text" maxlength="300"></div>
+    ${noteField}
     <div class="field"><label for="f_date">Date</label><select id="f_date">${sessionOptions('talk',sessionId,false)}</select></div>`;
   const reading = `<div class="field"><label for="f_name">Your name <span class="help" style="display:inline">(optional)</span></label><input id="f_name" type="text" maxlength="120" autocomplete="name"></div>
     <div class="field"><label for="f_title">Title of the reading</label><input id="f_title" type="text" maxlength="300"></div>
     <div class="field"><label for="f_author">Author</label><input id="f_author" type="text" maxlength="200"></div>
     <div class="field"><label for="f_link">Link to the reading</label><span class="help">If one is available.</span><input id="f_link" type="url" maxlength="500" placeholder="https://"></div>
     ${pdfField('Or attach the PDF','Optional.')}
+    ${noteField}
     <div class="field"><label for="f_date">Preferred date</label><select id="f_date">${sessionOptions('reading',sessionId,true)}</select></div>
     ${yn('f_intro','Would you be comfortable giving a brief 5-minute introduction before we begin the reading?')}
     ${yn('f_lead','Would you be comfortable leading the discussion for this session? (You don’t have to!)')}`;
   const draft = `<div class="field"><label for="f_name">Name</label><input id="f_name" type="text" maxlength="120" autocomplete="name"></div>
     <div class="field"><label for="f_title">Title of the draft</label><span class="help">A working title is fine.</span><input id="f_title" type="text" maxlength="300"></div>
     ${pdfField('Attach the draft','You can also send it to the organisers later if it isn’t ready yet.')}
+    ${noteField}
     <div class="field"><label for="f_date">Date</label><select id="f_date">${sessionOptions('draft',sessionId,false)}</select></div>`;
   const heading = {talk:'Book a talk', reading:'Suggest a paper reading', draft:'Book a draft reading'}[kind];
   const sendLabel = {talk:'Send talk request', reading:'Send reading suggestion', draft:'Send draft reading request'}[kind];
@@ -377,7 +397,7 @@ function openBooking(sessionId, kind){
 async function submitBooking(form){
   const kind=form.dataset.kind, err=$('#formErr'); err.hidden=true;
   const v=id=>($('#'+id)?.value||'').trim(), radio=n=>form.querySelector(`input[name="${n}"]:checked`)?.value||'';
-  const data={kind, name:v('f_name'), title:v('f_title'), author:'', link:'', intro:'', lead:'', sessionId:v('f_date')||null, fileId:null, fileName:''};
+  const data={kind, name:v('f_name'), title:v('f_title'), author:'', link:'', intro:'', lead:'', notes:v('f_notes'), sessionId:v('f_date')||null, fileId:null, fileName:''};
   const pdf=$('#f_pdf')?.files?.[0] || null;
   const miss=[];
   if (pdf && !(pdf.type==='application/pdf' || /\.pdf$/i.test(pdf.name))){ err.textContent='The attachment must be a PDF.'; err.hidden=false; return; }
@@ -429,18 +449,23 @@ async function deletePdf(fileId){
 }
 
 /* ---------- organiser actions (the database rules enforce these, not the page) ---------- */
-const bookingFrom = it => ({requestId:it.id, kind:it.kind, title:it.title||'', author:it.author||'', link:it.link||'', presenter:it.name||'', intro:it.intro||'', lead:it.lead||'', fileId:it.fileId||null, fileName:it.fileName||''});
+const bookingFrom = it => ({requestId:it.id, kind:it.kind, title:it.title||'', author:it.author||'', link:it.link||'', presenter:it.name||'', intro:it.intro||'', lead:it.lead||'', notes:it.notes||'', fileId:it.fileId||null, fileName:it.fileName||''});
 const reqExists = id => S.requests.some(r=>r.id===id);
-function clearBookingsOf(b, id, exceptSid){ for (const o of S.sessions) if (o.id!==exceptSid && o.booking?.requestId===id) b.update(sRef(o.id),{booking:null}); }
+function clearBookingsOf(b, id, exceptSid){
+  for (const o of S.sessions){
+    if (o.id===exceptSid) continue;
+    const mm=bookingsMapOf(o);
+    if (id in mm){ delete mm[id]; b.update(sRef(o.id), {bookings:mm, booking:null}); }
+  }
+}
 async function approve(id, sid){
   const it=S.requests.find(r=>r.id===id); if(!it) return;
   if (!sid){ toast('Choose a date for this request first.'); return; }
-  const s=S.sessions.find(x=>x.id===sid), prev=s.booking?.requestId;
-  if (prev && prev!==id && !confirm(`${sessionLabel(s)} already has “${s.booking.title}”. Replace it? That booking goes back to waiting.`)) return;
+  const s=S.sessions.find(x=>x.id===sid);
+  const mm=bookingsMapOf(s); mm[id]=bookingFrom(it);
   const b=writeBatch(db);
-  if (prev && prev!==id && reqExists(prev)) b.update(rRef(prev),{status:'pending', assignedSession:null});
   clearBookingsOf(b, id, sid);
-  b.update(sRef(sid),{booking:bookingFrom(it)});
+  b.update(sRef(sid),{bookings:mm, booking:null});
   b.update(rRef(id),{status:'approved', assignedSession:sid});
   try{ await b.commit(); toast('Confirmed and added to the schedule.'); }catch(e){ fail(e); }
 }
@@ -459,7 +484,7 @@ function openSessionEditor(id){
     <div class="field"><label for="s_kind">Open for</label><select id="s_kind">${[['any','Talk or reading'],['talk','Talks only'],['reading','Readings only (paper or draft)']].map(([v,l])=>`<option value="${v}" ${d.kind===v?'selected':''}>${l}</option>`).join('')}</select></div></div>
     <div class="field"><label class="check"><input id="s_cancel" type="checkbox" ${d.cancelled?'checked':''}> No meeting this week</label></div>
     <div class="field"><label for="s_notes">Note shown on the schedule</label><input id="s_notes" type="text" placeholder="e.g. Reading week" value="${esc(d.notes)}"></div>
-    ${s?.booking?`<div class="notice" style="margin:0 0 16px">Booked: ${kindName(s.booking.kind)}, “${esc(s.booking.title)}”. <button type="button" class="linkbtn" data-unbook="${s.id}">Remove booking</button></div>`:''}
+    ${s&&bookingsOf(s).length?bookingsOf(s).map(b=>`<div class="notice" style="margin:0 0 8px">Booked: ${kindName(b.kind)}, “${esc(b.title)}”.${b.zoom?` Zoom: ${esc(b.zoom)}.`:''} <button type="button" class="linkbtn" data-editbooking="${s.id}" data-req="${esc(b.requestId)}">Details</button> · <button type="button" class="linkbtn" data-unbook="${s.id}" data-req="${esc(b.requestId)}">Remove</button></div>`).join(''):''}
     ${s?'<p class="sub">To move a meeting to another date, add the new date and delete this one.</p>':''}
     <p class="err" id="formErr" hidden></p>
     <div class="foot">${s?`<button type="button" class="btn danger" data-delsess="${s.id}">Delete meeting</button>`:''}<div class="right"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn" type="submit">${s?'Save changes':'Add meeting'}</button></div></div></form>`);
@@ -471,25 +496,46 @@ async function saveSession(form){
     if (id) await updateDoc(sRef(id), data);
     else { const date=v('s_date'); if(!date){ err.textContent='Choose a date.'; err.hidden=false; return; }
       let nid=date; if (S.sessions.find(s=>s.id===nid)) nid=date+'-'+Math.random().toString(36).slice(2,5);
-      await setDoc(sRef(nid), {...data, date, booking:null}); }
+      await setDoc(sRef(nid), {...data, date, bookings:{}}); }
     closeDlg(); toast(id?'Meeting updated.':'Meeting added.');
   }catch(e){ fail(e); }
 }
-async function unbook(id){
-  const s=S.sessions.find(x=>x.id===id); if(!s?.booking) return;
+async function unbook(sid, rid){
+  const s=S.sessions.find(x=>x.id===sid); if(!s) return;
+  const b=bookingsOf(s).find(x=>x.requestId===rid); if(!b) return;
   if(!confirm('Remove this booking? The request goes back to waiting.')) return;
-  const b=writeBatch(db); b.update(sRef(id),{booking:null});
-  if (reqExists(s.booking.requestId)) b.update(rRef(s.booking.requestId),{status:'pending',assignedSession:null});
-  try{ await b.commit(); closeDlg(); toast('Booking removed.'); }catch(e){ fail(e); }
+  const mm=bookingsMapOf(s); delete mm[rid];
+  const wb=writeBatch(db); wb.update(sRef(sid),{bookings:mm, booking:null});
+  if (reqExists(rid)) wb.update(rRef(rid),{status:'pending',assignedSession:null});
+  try{ await wb.commit(); closeDlg(); toast('Booking removed.'); }catch(e){ fail(e); }
 }
 async function deleteSession(id){
   const s=S.sessions.find(x=>x.id===id);
-  if(!confirm(s?.booking?'This meeting has a booking. Delete it anyway? The request goes back to waiting.':'Delete this meeting?')) return;
+  const bs=bookingsOf(s);
+  if(!confirm(bs.length?'This meeting has bookings. Delete it anyway? Those requests go back to waiting.':'Delete this meeting?')) return;
   const b=writeBatch(db);
-  if (s?.booking && reqExists(s.booking.requestId)) b.update(rRef(s.booking.requestId),{status:'pending',assignedSession:null});
-  for (const r of S.requests) if (r.status==='pending' && r.sessionId===id) b.update(rRef(r.id),{sessionId:null});
+  for (const x of bs){ if (reqExists(x.requestId)) b.update(rRef(x.requestId),{status:'pending',assignedSession:null}); }
+  for (const r of S.requests){ if (r.status==='pending' && r.sessionId===id) b.update(rRef(r.id),{sessionId:null}); }
   b.delete(sRef(id));
   try{ await b.commit(); closeDlg(); toast('Meeting deleted.'); }catch(e){ fail(e); }
+}
+function openBookingEditor(sid, rid){
+  const s=S.sessions.find(x=>x.id===sid); if(!s) return;
+  const b=bookingsOf(s).find(x=>x.requestId===rid); if(!b) return;
+  openDlg(`<form id="bookEditForm" data-sid="${esc(sid)}" data-rid="${esc(rid)}"><h3>Booking details</h3>
+    <p class="sub">${esc(sessionLabel(s))} — ${kindName(b.kind)}, “${esc(b.title)}”.</p>
+    <div class="field"><label for="e_zoom">Zoom link</label><span class="help">Shown to everyone on the schedule. Leave blank if the meeting is in person.</span><input id="e_zoom" type="url" maxlength="500" placeholder="https://" value="${esc(b.zoom||'')}"></div>
+    <div class="field"><label for="e_notes">Note shown on the schedule</label><span class="help">Visible under this booking.</span><textarea class="note" id="e_notes" maxlength="500">${esc(b.notes||'')}</textarea></div>
+    <p class="err" id="formErr" hidden></p>
+    <div class="foot"><div class="right"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn" type="submit">Save details</button></div></div></form>`);
+}
+async function saveBookingEditor(form){
+  const sid=form.dataset.sid, rid=form.dataset.rid;
+  const s=S.sessions.find(x=>x.id===sid); const b=bookingsOf(s).find(x=>x.requestId===rid); if(!b) return;
+  let zoom=($('#e_zoom').value||'').trim(); const notes=($('#e_notes').value||'').trim();
+  if (zoom && !/^https?:\/\//i.test(zoom)) zoom='https://'+zoom;
+  const mm=bookingsMapOf(s); mm[rid]={...b, zoom, notes};
+  try{ await updateDoc(sRef(sid), {bookings:mm, booking:null}); closeDlg(); toast('Booking details saved.'); }catch(e){ fail(e); }
 }
 function openTerm(){
   const st=S.settings;
@@ -511,7 +557,7 @@ async function saveTerm(form){
   for(let w=w1; w<=wn; w++){ if(skip.has(w)) continue;
     const d=parseD(first); d.setDate(d.getDate()+(w-w1)*7); const id=isoD(d);
     if(S.sessions.find(s=>s.id===id)) continue;
-    b.set(sRef(id),{date:id, week:w, term, time:v('t_time'), room:v('t_room'), kind:v('t_kind'), notes:'', cancelled:false, booking:null}); n++; }
+    b.set(sRef(id),{date:id, week:w, term, time:v('t_time'), room:v('t_room'), kind:v('t_kind'), notes:'', cancelled:false, bookings:{}}); n++; }
   if (!S.settings.defaultTime && !S.settings.defaultRoom) b.set(doc(db,'config','settings'), {...S.settings, defaultTime:v('t_time'), defaultRoom:v('t_room')});
   try{ await b.commit(); closeDlg(); toast(`${n} meeting${n===1?'':'s'} added.`); }catch(e){ fail(e); }
 }
@@ -531,29 +577,35 @@ async function saveSettings(){
 }
 
 /* ---------- announcement ---------- */
+function announceLine(b){
+  let text;
+  if (b.kind==='talk') text=`${b.presenter||'our speaker'} will present “${b.title}”. There will be pastries, bagels or other delicious surprises.`;
+  else if (b.kind==='draft') text=`we’ll read and discuss a draft by ${b.presenter||'one of our members'}, “${b.title}”.${b.fileId?' You can download the draft from the schedule on the SERG site (link below).':''}`;
+  else { const roles=[b.intro==='yes'&&'give a short introduction', b.lead==='yes'&&'lead the discussion'].filter(Boolean);
+    text=`we’ll read “${b.title}”${b.author?` by ${b.author}`:''}.${b.link?` You can find it here: ${b.link}`:''}${b.fileId?' A PDF is available to download from the schedule on the SERG site (link below).':''}${b.presenter&&roles.length?` ${b.presenter} will ${roles.join(' and ')}.`:''}`; }
+  return `${text}${b.notes?`\nNote: ${b.notes}`:''}${b.zoom?`\nZoom: ${b.zoom}`:''}`;
+}
 function buildAnnouncement(s){
-  const b=s.booking, st=S.settings, when=`${fmtLong(s.date)}${s.time?', '+s.time:''}`;
-  let subject, lead;
-  if (b.kind==='talk'){
-    subject=`SERG week ${s.week ?? ''}: “${b.title}” by ${b.presenter||'TBC'} (${fmtShort(s.date)})`;
-    lead=`At this week’s Social Epistemology Reading Group, ${b.presenter||'our speaker'} will present “${b.title}”.\n\nThere will be pastries, bagels or other delicious surprises.`;
-  } else if (b.kind==='draft'){
-    subject=`SERG week ${s.week ?? ''}: draft reading, “${b.title}” by ${b.presenter||'TBC'} (${fmtShort(s.date)})`;
-    lead=`This week at the Social Epistemology Reading Group we’ll read and discuss a draft by ${b.presenter||'one of our members'}, “${b.title}”.${b.fileId?'\n\nYou can download the draft from the schedule on the SERG site (link below).':''}`;
-  } else {
-    subject=`SERG week ${s.week ?? ''}: reading “${b.title}” (${fmtShort(s.date)})`;
-    const roles=[b.intro==='yes'&&'give a short introduction', b.lead==='yes'&&'lead the discussion'].filter(Boolean);
-    lead=`This week at the Social Epistemology Reading Group we’ll read “${b.title}”${b.author?` by ${b.author}`:''}.${b.link?`\n\nYou can find it here: ${b.link}`:''}${b.fileId?'\n\nA PDF is available to download from the schedule on the SERG site (link below).':''}${b.presenter&&roles.length?`\n\n${b.presenter} will ${roles.join(' and ')}.`:''}`;
-  }
+  const bs=bookingsOf(s), st=S.settings, when=`${fmtLong(s.date)}${s.time?', '+s.time:''}`;
+  const first=bs[0]||{kind:'reading', title:''};
+  const more=bs.length>1?` and ${bs.length-1} more`:'';
+  let subject;
+  if (first.kind==='talk') subject=`SERG week ${s.week ?? ''}: “${first.title}” by ${first.presenter||'TBC'}${more} (${fmtShort(s.date)})`;
+  else if (first.kind==='draft') subject=`SERG week ${s.week ?? ''}: draft reading, “${first.title}” by ${first.presenter||'TBC'}${more} (${fmtShort(s.date)})`;
+  else subject=`SERG week ${s.week ?? ''}: reading “${first.title}”${more} (${fmtShort(s.date)})`;
+  const lead = bs.length===1
+    ? `This week at the Social Epistemology Reading Group ${announceLine(first)}`
+    : `This week at the Social Epistemology Reading Group we have ${bs.length} sessions:\n\n` + bs.map(b=>`• ${announceLine(b)}`).join('\n\n');
   const link=st.siteLink||location.origin+location.pathname;
   return {subject, body:`Hi all,\n\n${lead}\n\nWhen: ${when}\nWhere: ${s.room||'TBC'}\n\nSee the full schedule, book a slot to present, or suggest a reading: ${link}\n\nBest,\n${st.signoff||'The SERG organisers'}`};
 }
 function openAnnounce(id){
-  const t=todayStr(), list=sortedSessions().filter(s=>s.date>=t && s.booking && !s.cancelled);
+  const t=todayStr(), list=sortedSessions().filter(s=>s.date>=t && bookingsOf(s).length && !s.cancelled);
   if(!list.length){ openDlg(`<h3>Send an announcement</h3><p class="sub">There are no confirmed upcoming meetings to announce yet.</p><div class="foot"><div class="right"><button class="btn" data-close>Close</button></div></div>`); return; }
   const s=list.find(x=>x.id===id)||list[0], a=buildAnnouncement(s), st=S.settings;
+  const titleOf = x => { const bs=bookingsOf(x); return bs[0].title + (bs.length>1?` +${bs.length-1}`:''); };
   openDlg(`<div><h3>Send an announcement</h3><p class="sub">${st.mailingList?`To ${esc(st.mailingList)}.`:'Add the mailing list address in Settings to fill in the recipient.'} Edit anything before sending.</p>
-    <div class="field"><label for="a_sess">Meeting</label><select id="a_sess">${list.map(x=>`<option value="${x.id}" ${x.id===s.id?'selected':''}>${esc(sessionLabel(x))}: ${esc(x.booking.title)}</option>`).join('')}</select></div>
+    <div class="field"><label for="a_sess">Meeting</label><select id="a_sess">${list.map(x=>`<option value="${x.id}" ${x.id===s.id?'selected':''}>${esc(sessionLabel(x))}: ${esc(titleOf(x))}</option>`).join('')}</select></div>
     <div class="field"><label for="a_subj">Subject</label><input id="a_subj" type="text" value="${esc(a.subject)}"></div>
     <div class="field"><label for="a_body">Message</label><textarea id="a_body">${esc(a.body)}</textarea></div>
     <p class="sub" style="margin-top:-6px">“Open in Outlook” starts a draft in your computer’s default mail app. If a different app opens, copy the subject and message into a new Outlook email instead.</p>
@@ -596,16 +648,17 @@ document.addEventListener('click', e=>{
   if (d.reopen){ reopen(d.reopen); return; }
   if (d.remove){ removeReq(d.remove); return; }
   if (d.edit){ openSessionEditor(d.edit); return; }
+  if (d.editbooking){ openBookingEditor(d.editbooking, d.req); return; }
   if (d.act==='one'){ openSessionEditor(null); return; }
   if (d.act==='term'){ openTerm(); return; }
   if (d.act==='settings'){ openSettings(); return; }
   if (d.announce!==undefined){ openAnnounce(d.announce); return; }
-  if (d.unbook){ unbook(d.unbook); return; }
+  if (d.unbook){ unbook(d.unbook, d.req); return; }
   if (d.delsess){ deleteSession(d.delsess); return; }
 });
 document.addEventListener('submit', e=>{ e.preventDefault(); const f=e.target;
   if (f.id==='bookForm') submitBooking(f); else if (f.id==='sessForm') saveSession(f); else if (f.id==='termForm') saveTerm(f);
-  else if (f.id==='setForm') saveSettings(); });
+  else if (f.id==='setForm') saveSettings(); else if (f.id==='bookEditForm') saveBookingEditor(f); });
 document.addEventListener('input', e=>{ if(e.target.id==='a_subj'||e.target.id==='a_body') updateMailto(); });
 document.addEventListener('change', e=>{ if(e.target.id==='a_sess') openAnnounce(e.target.value); });
 
