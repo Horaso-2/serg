@@ -302,7 +302,7 @@ function renderSchedule(){
       } else if (st.k==='pending'){ const r=st.req[0];
         content=`<span class="tag pending">Requested, awaiting confirmation</span><div class="title">${esc(r.title)}</div><div class="who">${st.req.length>1?`${st.req.length} requests for this date`:esc(r.name||'')}</div>`;
       } else content=`<span class="tag open">Free</span><div class="who">${s.kind==='talk'?'Open for a talk':s.kind==='reading'?'Open for a paper or draft reading':'Open for a talk or a reading'}</div>`;
-      if (!past && st.k!=='cancelled' && canBook()) act+=`<button class="btn ${st.k==='open'?'open':'ghost'} small" data-book="${s.id}">${st.k==='open'?'Book this date':'Request too'}</button>`;
+      if (!past && st.k!=='cancelled' && canBook()) act+=`<button class="btn ${st.k==='open'?'open':'ghost'} small" data-book="${s.id}">${st.k==='open'?'Book this date':'Request'}</button>`;
       if (S.isAdmin){
         if (st.k==='booked'&&!past) act+=`<button class="btn ghost small" data-announce="${s.id}">Announce</button>`;
         if (st.k==='booked') act+=st.bookings.map(b=>`<button class="btn ghost small" data-editbooking="${s.id}" data-req="${esc(b.requestId)}">Details</button>`).join('');
